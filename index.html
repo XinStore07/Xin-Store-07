@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -29,7 +30,7 @@
 <style>
 :root{--bg:#080800;--surface:#111100;--card:#1c1900;--border:#3a3000;--gold:#c9a84c;--gold2:#f5d078;--gold3:#ffe9a0;--danger:#ff4f4f;--text:#f5ecd7;--muted:#8a7a50;}
 *{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;}
+body{background:transparent;color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;}
 nav{position:sticky;top:0;z-index:100;background:rgba(8,8,0,0.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;height:64px;}
 .nav-logo{display:flex;align-items:center;gap:.6rem;}
 .nav-logo img{height:42px;width:42px;object-fit:cover;border-radius:50%;border:1.5px solid var(--gold);}
@@ -41,7 +42,45 @@ nav{position:sticky;top:0;z-index:100;background:rgba(8,8,0,0.95);backdrop-filte
 .cart-count{background:#000;color:var(--gold2);border:1px solid var(--gold);border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;}
 .admin-btn{background:transparent;border:1px solid var(--border);color:var(--muted);padding:.45rem .9rem;border-radius:8px;cursor:pointer;font-size:.82rem;}
 .admin-btn:hover{border-color:var(--gold);color:var(--gold);}
-.hero{padding:3.5rem 1.5rem 2rem;text-align:center;background:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(201,168,76,0.13) 0%,transparent 70%);}
+.hero{padding:3.5rem 1.5rem 2rem;text-align:center;position:relative;min-height:340px;}
+.hero-canvas{position:absolute;inset:0;z-index:0;pointer-events:none;width:100%;height:100%;display:block;}
+#bgCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;display:block;}
+.hero>*:not(.hero-canvas){position:relative;z-index:1;}
+.owner-panel-overlay{position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:800;display:none;align-items:center;justify-content:center;padding:1rem;}
+.owner-panel-overlay.open{display:flex;}
+.owner-panel{background:linear-gradient(135deg,#0d0c00,#1a1700);border:2px solid var(--gold);border-radius:20px;padding:2rem;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;position:relative;}
+.owner-panel-title{font-size:1.2rem;font-weight:800;color:var(--gold2);margin-bottom:.25rem;display:flex;align-items:center;gap:.6rem;}
+.owner-panel-sub{font-size:.75rem;color:var(--muted);margin-bottom:1.5rem;letter-spacing:1px;}
+.owner-close{position:absolute;top:1.2rem;right:1.2rem;background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.4rem;}
+.owner-section{background:rgba(201,168,76,0.06);border:1px solid var(--border);border-radius:12px;padding:1rem;margin-bottom:1rem;}
+.owner-section-title{font-size:.7rem;color:var(--gold);font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:.75rem;}
+.owner-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.6rem;}
+.owner-stat{background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.25);border-radius:10px;padding:.75rem;text-align:center;}
+.owner-stat .os-num{font-size:1.6rem;font-weight:900;color:var(--gold2);font-family:monospace;}
+.owner-stat .os-label{font-size:.68rem;color:var(--muted);margin-top:.1rem;}
+.owner-note-area{width:100%;background:rgba(0,0,0,.4);border:1px solid var(--border);border-radius:8px;padding:.65rem .85rem;color:var(--text);font-size:.85rem;outline:none;font-family:inherit;resize:vertical;min-height:70px;}
+.owner-note-area:focus{border-color:var(--gold);}
+.owner-save-btn{width:100%;padding:.7rem;background:var(--gold);color:#000;border:none;border-radius:8px;cursor:pointer;font-weight:800;font-size:.9rem;margin-top:.5rem;font-family:inherit;}
+.owner-save-btn:hover{background:var(--gold2);}
+.owner-revenue-row{display:flex;justify-content:space-between;align-items:center;padding:.45rem 0;border-bottom:1px solid rgba(201,168,76,0.1);font-size:.83rem;}
+.owner-revenue-row:last-child{border-bottom:none;}
+.owner-revenue-row .orr-label{color:var(--muted);}
+.owner-revenue-row .orr-val{color:var(--gold2);font-weight:700;font-family:monospace;}
+.owner-tag{display:inline-block;font-size:.65rem;padding:.18rem .5rem;border-radius:50px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+.owner-tag.green{background:rgba(76,175,80,0.2);color:#4caf50;border:1px solid rgba(76,175,80,0.3);}
+.owner-tag.red{background:rgba(255,79,79,0.15);color:#ff6b6b;border:1px solid rgba(255,79,79,0.25);}
+.owner-goal-bar{background:rgba(0,0,0,.3);border-radius:50px;height:8px;margin:.4rem 0 .2rem;overflow:hidden;}
+.owner-goal-fill{height:100%;border-radius:50px;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width .6s ease;}
+.owner-todo-item{display:flex;align-items:center;gap:.6rem;padding:.4rem 0;font-size:.83rem;cursor:pointer;}
+.owner-todo-item input[type=checkbox]{accent-color:var(--gold);width:15px;height:15px;cursor:pointer;}
+.owner-todo-item span{color:var(--text);}
+.owner-todo-item.done span{text-decoration:line-through;color:var(--muted);}
+.owner-todo-input-row{display:flex;gap:.4rem;margin-top:.4rem;}
+.owner-todo-input{flex:1;background:rgba(0,0,0,.4);border:1px solid var(--border);border-radius:7px;padding:.5rem .7rem;color:var(--text);font-size:.83rem;outline:none;font-family:inherit;}
+.owner-todo-input:focus{border-color:var(--gold);}
+.owner-add-todo{background:var(--gold);color:#000;border:none;border-radius:7px;padding:.5rem .85rem;font-weight:700;cursor:pointer;font-size:.83rem;font-family:inherit;}
+.owner-secret-btn{position:fixed;bottom:1.5rem;right:1.5rem;width:48px;height:48px;border-radius:50%;background:rgba(201,168,76,0.15);border:1.5px solid rgba(201,168,76,0.35);color:var(--gold);font-size:1.3rem;cursor:pointer;z-index:150;display:flex;align-items:center;justify-content:center;transition:all .3s;}
+.owner-secret-btn:hover{background:rgba(201,168,76,0.3);border-color:var(--gold);}
 .hero-tag{font-size:.72rem;color:var(--gold);letter-spacing:4px;margin-bottom:.6rem;text-transform:uppercase;}
 .hero h1{font-size:clamp(1.8rem,5vw,3.5rem);font-weight:800;line-height:1.1;margin-bottom:.6rem;}
 .hero h1 em{font-style:normal;background:linear-gradient(90deg,var(--gold),var(--gold3),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
@@ -284,6 +323,7 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:.78rem;border
 </head>
 <body>
 
+<canvas id="bgCanvas"></canvas>
 <div class="announce-bar" id="announceBar">
   <span id="announceText">🎉 Welcome to Xin Store 07 — Fast delivery in Addis Ababa!</span>
   <button class="announce-close" onclick="document.getElementById('announceBar').classList.remove('show')">✕</button>
@@ -652,6 +692,64 @@ footer{text-align:center;padding:2rem;color:var(--muted);font-size:.78rem;border
   </div>
 </div>
 
+<!-- OWNER PANEL -->
+<button class="owner-secret-btn" id="ownerSecretBtn" onclick="ownerSecretTap()" title="Owner Panel">👑</button>
+<div class="owner-panel-overlay" id="ownerPanelOverlay">
+  <div class="owner-panel">
+    <button class="owner-close" onclick="closeOwnerPanel()">×</button>
+    <div class="owner-panel-title">👑 Owner's Dashboard</div>
+    <div class="owner-panel-sub">PRIVATE · XIN STORE 07 · FOR YOUR EYES ONLY</div>
+
+    <div class="owner-section">
+      <div class="owner-section-title">📊 Live Store Stats</div>
+      <div class="owner-stat-grid">
+        <div class="owner-stat"><div class="os-num" id="owStat1">0</div><div class="os-label">Products Listed</div></div>
+        <div class="owner-stat"><div class="os-num" id="owStat2">0</div><div class="os-label">Categories</div></div>
+        <div class="owner-stat"><div class="os-num" id="owStat3">0</div><div class="os-label">Low Stock Items</div></div>
+        <div class="owner-stat"><div class="os-num" id="owStat4">0</div><div class="os-label">Out of Stock</div></div>
+      </div>
+    </div>
+
+    <div class="owner-section">
+      <div class="owner-section-title">🎯 Daily Revenue Goal</div>
+      <div class="owner-revenue-row"><span class="orr-label">Goal</span><span class="orr-val" id="owGoalVal">—</span></div>
+      <div class="owner-revenue-row"><span class="orr-label">Today's Progress</span><span class="orr-val" id="owProgressVal">0 birr</span></div>
+      <div class="owner-goal-bar"><div class="owner-goal-fill" id="owGoalFill" style="width:0%"></div></div>
+      <div style="font-size:.72rem;color:var(--muted);margin-bottom:.6rem;" id="owGoalPct">0% of goal</div>
+      <div style="display:flex;gap:.4rem;">
+        <input type="number" id="owGoalInput" class="owner-todo-input" placeholder="Set daily goal (birr)" style="flex:1;"/>
+        <input type="number" id="owTodayInput" class="owner-todo-input" placeholder="Today's earnings" style="flex:1;"/>
+        <button class="owner-add-todo" onclick="saveOwnerGoal()">Set</button>
+      </div>
+    </div>
+
+    <div class="owner-section">
+      <div class="owner-section-title">📝 Private Notes</div>
+      <textarea class="owner-note-area" id="owNotes" placeholder="Write anything here — supplier contacts, prices, reminders, ideas… Only you see this."></textarea>
+      <button class="owner-save-btn" onclick="saveOwnerNotes()">💾 Save Notes</button>
+    </div>
+
+    <div class="owner-section">
+      <div class="owner-section-title">✅ My To-Do List</div>
+      <div id="owTodoList"></div>
+      <div class="owner-todo-input-row">
+        <input type="text" class="owner-todo-input" id="owTodoInput" placeholder="Add a task…" onkeydown="if(event.key==='Enter')addOwnerTodo()"/>
+        <button class="owner-add-todo" onclick="addOwnerTodo()">+ Add</button>
+      </div>
+    </div>
+
+    <div class="owner-section">
+      <div class="owner-section-title">⚡ Quick Actions</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;">
+        <button onclick="closeOwnerPanel();openAdmin();" style="padding:.6rem;background:rgba(201,168,76,0.12);border:1px solid var(--gold);color:var(--gold2);border-radius:8px;cursor:pointer;font-size:.8rem;font-weight:700;font-family:inherit;">⚙️ Open Admin</button>
+        <button onclick="window.open('https://t.me/xinstore07','_blank')" style="padding:.6rem;background:rgba(201,168,76,0.12);border:1px solid var(--gold);color:var(--gold2);border-radius:8px;cursor:pointer;font-size:.8rem;font-weight:700;font-family:inherit;">✈️ Telegram Channel</button>
+        <button onclick="window.open('https://wa.me/251945199496','_blank')" style="padding:.6rem;background:rgba(201,168,76,0.12);border:1px solid var(--gold);color:var(--gold2);border-radius:8px;cursor:pointer;font-size:.8rem;font-weight:700;font-family:inherit;">💬 WhatsApp</button>
+        <button onclick="clearOwnerData()" style="padding:.6rem;background:rgba(255,79,79,0.1);border:1px solid rgba(255,79,79,0.3);color:#ff6b6b;border-radius:8px;cursor:pointer;font-size:.8rem;font-weight:700;font-family:inherit;">🗑 Clear My Data</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <!-- ABOUT SECTION -->
@@ -949,6 +1047,7 @@ function openOrderForm(){
   clearReceipt();
   selectedPayMethod = ''; currentOrderCode = ''; fulfillmentMode = '';
   orderDeliveryKm=0; orderDeliveryFee=0; customerLat=null; customerLng=null;
+  document.getElementById('policyCheck').checked=false;
   const sb=document.getElementById('submitBtn');
   sb.disabled=true; sb.style.opacity='.5'; sb.style.cursor='not-allowed'; sb.textContent='Choose delivery or pickup';
 }
@@ -1099,6 +1198,7 @@ function clearReceipt(){
 
 function checkSubmitReady(){
   const sb=document.getElementById('submitBtn');
+  const policyAgreed=document.getElementById('policyCheck')&&document.getElementById('policyCheck').checked;
   if(!fulfillmentMode){
     sb.disabled=true; sb.style.opacity='.5'; sb.textContent='Choose delivery or pickup';
   } else if(fulfillmentMode==='delivery'&&!customerLat){
@@ -1107,6 +1207,8 @@ function checkSubmitReady(){
     sb.disabled=true; sb.style.opacity='.5'; sb.textContent='Choose payment method';
   } else if(selectedPayMethod!=='arrival'&&!receiptDataUrl){
     sb.disabled=true; sb.style.opacity='.5'; sb.textContent='Upload receipt to confirm';
+  } else if(!policyAgreed){
+    sb.disabled=true; sb.style.opacity='.5'; sb.textContent='Please agree to store policies';
   } else {
     sb.disabled=false; sb.style.opacity='1'; sb.style.cursor='pointer';
     sb.textContent=selectedPayMethod==='arrival'?'Confirm Order 🤝':'Confirm & Send Order 🚀';
@@ -1124,9 +1226,10 @@ async function submitOrder(){
   const PAY_LABELS={cbe:'🏦 CBE',telebirr:'📱 TeleBirr',mpesa:'💚 M-Pesa',awash:'🏦 Awash',abyssinia:'🏦 Abyssinia',arrival:'🤝 Cash on Arrival'};
   const PAY_ACCOUNTS={cbe:'1000643819671 (Dagmawi Tadesse)',telebirr:'0945199496 (Dagmawi Tadesse)',mpesa:'0717384931 (Dagmawi Tadesse)',awash:'013351115721702 (Dagmawi Tadesse)',abyssinia:'219570667 (Dagmawi Tadesse)',arrival:'—'};
   const fulfillLabel=fulfillmentMode==='pickup'?'🏪 Pickup at Piassa':'🛵 Delivery';
+  const mapsLine=fulfillmentMode==='delivery'&&customerLat?`\n🗺 *Customer Location:* https://maps.google.com/?q=${customerLat},${customerLng}`:'';
   const payNote=selectedPayMethod==='arrival'?'\n💵 *Payment:* Cash on arrival':
     `\n💳 *Payment:* ${PAY_LABELS[selectedPayMethod]}\n🔢 *Account:* ${PAY_ACCOUNTS[selectedPayMethod]}\n🔖 *Order Code in transfer note:* \`${currentOrderCode}\`\n🧾 *Receipt:* Attached`;
-  const msg=`🛍️ *NEW ORDER — XIN STORE 07*\n\n🔖 *Order Code:* \`${currentOrderCode}\`\n📦 *Fulfillment:* ${fulfillLabel}\n\n👤 *Name:* ${name}\n📞 *Phone:* ${phone}\n📍 *Address:* ${address}\n${note?`📝 *Note:* ${note}\n`:''}\n📦 *Items:*\n${itemsText}\n\n━━━━━━━━━━━━━━\n${orderItemsTotal>0?`🛍 *Items Total:* ${orderItemsTotal.toLocaleString()} birr\n`:''}${fulfillmentMode==='pickup'?'🏪 *Pickup — no delivery fee*\n':'🚚 *Distance:* '+orderDeliveryKm+' km\n💰 *Delivery Fee:* '+orderDeliveryFee.toLocaleString()+' birr\n'}━━━━━━━━━━━━━━\n✅ *TOTAL:* ${grandTotal}\n━━━━━━━━━━━━━━${payNote}\n━━━━━━━━━━━━━━\n⏰ ${new Date().toLocaleString()}`;
+  const msg=`🛍️ *NEW ORDER — XIN STORE 07*\n\n🔖 *Order Code:* \`${currentOrderCode}\`\n📦 *Fulfillment:* ${fulfillLabel}${mapsLine}\n\n👤 *Name:* ${name}\n📞 *Phone:* ${phone}\n📍 *Address:* ${address}\n${note?`📝 *Note:* ${note}\n`:''}\n📦 *Items:*\n${itemsText}\n\n━━━━━━━━━━━━━━\n${orderItemsTotal>0?`🛍 *Items Total:* ${orderItemsTotal.toLocaleString()} birr\n`:''}${fulfillmentMode==='pickup'?'🏪 *Pickup — no delivery fee*\n':'🚚 *Distance:* '+orderDeliveryKm+' km\n💰 *Delivery Fee:* '+orderDeliveryFee.toLocaleString()+' birr\n'}━━━━━━━━━━━━━━\n✅ *TOTAL:* ${grandTotal}\n━━━━━━━━━━━━━━${payNote}\n━━━━━━━━━━━━━━\n⏰ ${new Date().toLocaleString()}`;
   const sb=document.getElementById('submitBtn');
   sb.disabled=true; sb.textContent='Sending…';
   try{
@@ -1513,10 +1616,226 @@ function showToast(msg, isErr=false){
   setTimeout(()=>t.classList.remove('show'),2500);
 }
 
+
+// ─── HERO CANVAS ANIMATION ────────────────────────────────────────────────────
+function initHeroCanvas(){
+  const canvas=document.getElementById('bgCanvas');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  let W,H,particles=[];
+  const GOLD='rgba(201,168,76,', GOLD2='rgba(245,208,120,', GOLD3='rgba(255,233,160,';
+  const colors=[GOLD,GOLD2,GOLD3,'rgba(180,140,50,'];
+
+  function resize(){
+    W=canvas.width=window.innerWidth;
+    H=canvas.height=window.innerHeight;
+  }
+
+  function mkParticle(){
+    const r=Math.random()*2.5+0.5;
+    return{x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.3,vy:-Math.random()*.4-.1,r,alpha:Math.random()*.6+.2,color:colors[Math.floor(Math.random()*colors.length)],life:1,decay:Math.random()*.004+.001};
+  }
+
+  function init(){
+    particles=[];
+    for(let i=0;i<80;i++){const p=mkParticle();p.y=Math.random()*H;particles.push(p);}
+  }
+
+  let frame=0;
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    // deep space background
+    const bg=ctx.createRadialGradient(W*.5,0,0,W*.5,H*.6,W*.9);
+    bg.addColorStop(0,'rgba(30,24,0,0.95)');
+    bg.addColorStop(.4,'rgba(15,12,0,0.97)');
+    bg.addColorStop(1,'rgba(8,8,0,1)');
+    ctx.fillStyle=bg;
+    ctx.fillRect(0,0,W,H);
+
+    // Flowing gold light rays from top
+    for(let i=0;i<5;i++){
+      const x=W*(0.1+i*0.2)+Math.sin(frame*.003+i)*40;
+      const grad=ctx.createLinearGradient(x,0,x+60,H*.7);
+      grad.addColorStop(0,'rgba(201,168,76,0.12)');
+      grad.addColorStop(.5,'rgba(201,168,76,0.04)');
+      grad.addColorStop(1,'rgba(201,168,76,0)');
+      ctx.fillStyle=grad;
+      ctx.beginPath();
+      ctx.moveTo(x-20,0);ctx.lineTo(x+80,0);ctx.lineTo(x+120,H*.7);ctx.lineTo(x+40,H*.7);
+      ctx.closePath();ctx.fill();
+    }
+
+    // Particles
+    if(frame%4===0&&particles.length<120)particles.push(mkParticle());
+    particles=particles.filter(p=>{
+      p.x+=p.vx; p.y+=p.vy; p.life-=p.decay; p.alpha=p.life*.7;
+      if(p.life<=0||p.y<-10)return false;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=p.color+p.alpha+')';
+      ctx.fill();
+      // tiny sparkle cross on bigger particles
+      if(p.r>1.8&&p.life>.5){
+        ctx.strokeStyle=p.color+(p.alpha*.6)+')';
+        ctx.lineWidth=.5;
+        ctx.beginPath();ctx.moveTo(p.x-p.r*2,p.y);ctx.lineTo(p.x+p.r*2,p.y);ctx.stroke();
+        ctx.beginPath();ctx.moveTo(p.x,p.y-p.r*2);ctx.lineTo(p.x,p.y+p.r*2);ctx.stroke();
+      }
+      return true;
+    });
+
+    // Horizontal shimmer lines
+    for(let i=0;i<3;i++){
+      const y=H*(0.25+i*.25)+Math.sin(frame*.005+i*2)*15;
+      const shimmer=ctx.createLinearGradient(0,y,W,y);
+      shimmer.addColorStop(0,'rgba(201,168,76,0)');
+      shimmer.addColorStop(((frame*.002+i*.3)%1),'rgba(201,168,76,0.08)');
+      shimmer.addColorStop(Math.min(((frame*.002+i*.3)%1)+.15,1),'rgba(245,208,120,0.06)');
+      shimmer.addColorStop(1,'rgba(201,168,76,0)');
+      ctx.strokeStyle=shimmer;
+      ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();
+    }
+
+    // Central glow pulse
+    const pulse=0.5+0.5*Math.sin(frame*.02);
+    const glow=ctx.createRadialGradient(W/2,H*.3,0,W/2,H*.3,W*.45);
+    glow.addColorStop(0,`rgba(201,168,76,${0.08*pulse})`);
+    glow.addColorStop(.5,`rgba(201,168,76,${0.03*pulse})`);
+    glow.addColorStop(1,'rgba(201,168,76,0)');
+    ctx.fillStyle=glow;
+    ctx.fillRect(0,0,W,H);
+
+    frame++;
+    requestAnimationFrame(draw);
+  }
+  resize();init();draw();
+  window.addEventListener('resize',()=>{resize();init();});
+}
+
+// ─── OWNER PANEL ──────────────────────────────────────────────────────────────
+const OW_KEY='xin_owner_v1';
+let ownerTapCount=0,ownerTapTimer=null;
+let ownerTodos=[];
+
+function ownerSecretTap(){
+  const pw=prompt('👑 Owner Access — Enter Password:');
+  if(pw===null)return;
+  if(pw===ADMIN_PASSWORD){openOwnerPanel();}
+  else if(pw!==''){showToast('❌ Wrong password',true);}
+}
+
+function openOwnerPanel(){
+  loadOwnerData();
+  refreshOwnerStats();
+  document.getElementById('ownerPanelOverlay').classList.add('open');
+}
+
+function closeOwnerPanel(){
+  document.getElementById('ownerPanelOverlay').classList.remove('open');
+}
+
+function loadOwnerData(){
+  try{
+    const d=JSON.parse(localStorage.getItem(OW_KEY)||'{}');
+    document.getElementById('owNotes').value=d.notes||'';
+    document.getElementById('owGoalInput').value=d.goal||'';
+    document.getElementById('owTodayInput').value=d.today||'';
+    ownerTodos=d.todos||[];
+    updateOwnerGoalUI(d.goal,d.today);
+    renderOwnerTodos();
+  }catch(e){}
+}
+
+function saveOwnerData(extra){
+  try{
+    const cur=JSON.parse(localStorage.getItem(OW_KEY)||'{}');
+    const merged=Object.assign(cur,extra);
+    localStorage.setItem(OW_KEY,JSON.stringify(merged));
+  }catch(e){}
+}
+
+function saveOwnerNotes(){
+  saveOwnerData({notes:document.getElementById('owNotes').value});
+  showToast('📝 Notes saved!');
+}
+
+function saveOwnerGoal(){
+  const goal=parseFloat(document.getElementById('owGoalInput').value)||0;
+  const today=parseFloat(document.getElementById('owTodayInput').value)||0;
+  saveOwnerData({goal,today});
+  updateOwnerGoalUI(goal,today);
+  showToast('🎯 Goal updated!');
+}
+
+function updateOwnerGoalUI(goal,today){
+  const g=parseFloat(goal)||0,t=parseFloat(today)||0;
+  document.getElementById('owGoalVal').textContent=g?g.toLocaleString()+' birr':'Not set';
+  document.getElementById('owProgressVal').textContent=t?t.toLocaleString()+' birr':'0 birr';
+  const pct=g>0?Math.min(100,Math.round(t/g*100)):0;
+  document.getElementById('owGoalFill').style.width=pct+'%';
+  document.getElementById('owGoalPct').textContent=pct+'% of goal'+(pct>=100?' 🎉 Goal reached!':'');
+}
+
+function addOwnerTodo(){
+  const inp=document.getElementById('owTodoInput');
+  const txt=inp.value.trim();
+  if(!txt)return;
+  ownerTodos.push({text:txt,done:false});
+  inp.value='';
+  saveOwnerData({todos:ownerTodos});
+  renderOwnerTodos();
+}
+
+function toggleOwnerTodo(i){
+  ownerTodos[i].done=!ownerTodos[i].done;
+  saveOwnerData({todos:ownerTodos});
+  renderOwnerTodos();
+}
+
+function deleteOwnerTodo(i){
+  ownerTodos.splice(i,1);
+  saveOwnerData({todos:ownerTodos});
+  renderOwnerTodos();
+}
+
+function renderOwnerTodos(){
+  const list=document.getElementById('owTodoList');
+  if(!ownerTodos.length){list.innerHTML='<div style="font-size:.78rem;color:var(--muted);padding:.35rem 0;">No tasks yet — add one below!</div>';return;}
+  list.innerHTML=ownerTodos.map((t,i)=>`
+    <div class="owner-todo-item ${t.done?'done':''}" onclick="toggleOwnerTodo(${i})">
+      <input type="checkbox" ${t.done?'checked':''} onclick="event.stopPropagation();toggleOwnerTodo(${i})"/>
+      <span style="flex:1;">${t.text}</span>
+      <button onclick="event.stopPropagation();deleteOwnerTodo(${i})" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:.85rem;padding:.1rem .3rem;">✕</button>
+    </div>`).join('');
+}
+
+function refreshOwnerStats(){
+  const low=products.filter(p=>p.stock!==undefined&&p.stock!==''&&Number(p.stock)>0&&Number(p.stock)<=5).length;
+  const out=products.filter(p=>p.stock!==undefined&&p.stock!==''&&Number(p.stock)<=0).length;
+  document.getElementById('owStat1').textContent=products.length;
+  document.getElementById('owStat2').textContent=categories.length;
+  document.getElementById('owStat3').textContent=low;
+  document.getElementById('owStat4').textContent=out;
+}
+
+function clearOwnerData(){
+  if(!confirm('Clear all your private owner data (notes, goals, todos)? This cannot be undone.'))return;
+  localStorage.removeItem(OW_KEY);
+  document.getElementById('owNotes').value='';
+  document.getElementById('owGoalInput').value='';
+  document.getElementById('owTodayInput').value='';
+  ownerTodos=[];
+  renderOwnerTodos();
+  updateOwnerGoalUI(0,0);
+  showToast('🗑 Owner data cleared');
+}
+
 window.addEventListener('DOMContentLoaded',()=>{
   loadFromStorage();
   renderCatsBar();
   renderProducts();
+  initHeroCanvas();
   setTimeout(()=>document.getElementById('welcomeOverlay').classList.add('open'), 1000);
 });
 </script>
